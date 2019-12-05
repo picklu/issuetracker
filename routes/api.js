@@ -31,8 +31,8 @@ module.exports = function (app) {
   app.route('/api/issues/:project')
 
     .get(function (req, res) {
-      var project = req.params.project;
-
+      var project = req.params;
+      res.json(project);
     })
 
     .post(function (req, res) {
