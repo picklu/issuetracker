@@ -12,7 +12,17 @@ var expect = require('chai').expect;
 var MongoClient = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
 
-const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
+const CONNECTION_STRING = process.env.DB; 
+MongoClient.connect(CONNECTION_STRING, function(err, connection) {
+  if (err) {
+    console.log('Connection to DB failed!');
+  }
+  else if (connection) {
+    console.log('Connection to DB successful!');
+    var db = connection.db('issutracker');
+
+  }
+});
 
 module.exports = function (app) {
 
