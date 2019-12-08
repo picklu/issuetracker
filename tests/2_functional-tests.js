@@ -40,15 +40,49 @@ suite('Functional Tests', function () {
         })
         .catch(function (err) {
           console.log(err);
-        })
+        });
     });
 
     test('Required fields filled in', function (done) {
-
+      chai.request(server)
+        .post('/api/issues/test')
+        .send({
+          issue_title: 'Title',
+          issue_text: 'text',
+          created_by: 'Functional Test - Every field filled in',
+        })
+        .then(function (res) {
+          const { body, status } = res;
+          assert.equal(status, 200);
+          assert.equal(body.issue_title, 'Title');
+          assert.equal(body.issue_text, 'text');
+          assert.equal(body.created_by, 'Functional Test - Every field filled in');
+          assert.equal(body.assigned_to, '');
+          assert.equal(body.status_text, '');
+          assert.isString(body._id);
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
     });
 
     test('Missing required fields', function (done) {
-
+      chai.request(server)
+        .post('/api/issues/test')
+        .send({
+          assigned_to: 'Chai and Mocha',
+          status_text: 'In QA'
+        })
+        .then(function (res) {
+          const { body, status } = res;
+          assert.equal(status, 422);
+          assert.property(body, 'error');
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
     });
 
   });
