@@ -64,43 +64,31 @@ module.exports = function (app) {
 
     .post(async function (req, res) {
       var project = req.params.project;
-      var response = { project: project };
       var issue_title = req.body.issue_title;
       var issue_text = req.body.issue_text;
       var created_by = req.body.created_by;
       var assigned_to = req.body.assigned_to || '';
       var status_text = req.body.status_text || '';
-      if (!issue_title) {
-        return res.status(422).json({ error: '"Titile" field is empty!' })
-      }
-      else {
-        response.issue_title = issue_title;
+
+      var issue = { project: project };
+      var now = new Date().toISOString();
+
+      // sanity check
+      if (!issue_title || !issue_text || !created_by) {
+        return res.status(422).json({ error: '"One or more important fields are empty!' })
       }
 
-      if (!issue_text) {
-        return res.status(422).json({ error: '"Text" field is empty!' })
-      }
-      else {
-        response.issue_text = issue_text;
-      }
-
-      if (!created_by) {
-        return res.status(422).json({ error: '"Created by" field is empty!' })
-      }
-      else {
-        response.created_by = created_by;
-      }
-
-      response.assigned_to = assigned_to;
-      response.status_text = status_text;
-
-      const now = new Date().toISOString();
-      response.created_on = now;
-      response.updated_on = now;
+      issue.assigned_to = assigned_to;
+      issue.status_text = status_text;
+      issue.created_on = now;
+      issue.updated_on = now;
+      issue.issue_title = issue_title;
+      issue.issue_text = issue_text;
+      issue.created_by = created_by;
 
       let result;
       try {
-        result = await insertData(project, response);
+        result = await insertData(project, issue);
       }
       catch (error) {
         return res.json({ error: error });
@@ -109,7 +97,8 @@ module.exports = function (app) {
       if (result.error) {
         return res.json(result);
       }
-      return res.json(result.ops[0]);
+      issue._id = result.insertedId;
+      return res.json(issue);
     })
 
     .put(function (req, res) {
