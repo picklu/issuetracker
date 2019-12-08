@@ -27,19 +27,20 @@ suite('Functional Tests', function () {
           assigned_to: 'Chai and Mocha',
           status_text: 'In QA'
         })
-        .end(function (err, res) {
+        .then(function (res) {
           const { body, status } = res;
           assert.equal(status, 200);
           assert.equal(body.issue_title, 'Title');
           assert.equal(body.issue_text, 'text');
           assert.equal(body.created_by, 'Functional Test - Every field filled in');
           assert.equal(body.assigned_to, 'Chai and Mocha');
-          assert.equal(body.issue_title, 'Title');
           assert.equal(body.status_text, 'In QA');
-          console.log("=== before ===");
+          assert.isString(body._id);
           done();
-          console.log("=== before ===");
-        });
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
     });
 
     test('Required fields filled in', function (done) {
