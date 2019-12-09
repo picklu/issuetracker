@@ -17,6 +17,7 @@ const DB_NAME = process.env.DB_NAME;
 
 // aync:await in mongodb
 let client;
+// connect to the database
 async function connectDB() {
   if (!client) {
     try {
@@ -30,6 +31,7 @@ async function connectDB() {
   return { error: 'Previous connection was not closed!' };
 }
 
+// insert data to the database
 async function insertData(project, data) {
   const dbConn = await connectDB();
   if (dbConn.error) {
@@ -50,6 +52,81 @@ async function insertData(project, data) {
     return { error: error };
   }
 }
+
+// update issue in the database
+async function updateData(project, id, data) {
+  const dbConn = await connectDB();
+  if (dbConn.error) {
+    return { error: dbConn.error };
+  }
+  const db = dbConn.db;
+  const collection = db.collection(project);
+  let result;
+  try {
+    result = await collection.updateOne({ _id: id }, { $set: data });
+    if (client) {
+      await client.close();
+      client = undefined;
+    }
+    return result;
+  }
+  catch (error) {
+    return { error: error };
+  } 
+}
+
+// get issue from the database
+async function getData(project, data) {
+  const dbConn = await connectDB();
+  if (dbConn.error) {
+    return { error: dbConn.error };
+  }
+  const db = dbConn.db;
+  const collection = db.collection(project);
+  let result;
+  try {
+    result = await collection.find(data);
+    if (client) {
+      await client.close();
+      client = undefined;
+    }
+    return result;
+  }
+  catch (error) {
+    return { error: error };
+  } 
+}
+
+
+// delete issue in the database
+async function deleteData(project, id) {
+  const dbConn = await connectDB();
+  if (dbConn.error) {
+    return { error: dbConn.error };
+  }
+  const db = dbConn.db;
+  const collection = db.collection(project);
+  let result;
+  try {
+    result = await collection.findOneAndDelete({ _id: id }, { $set: data });
+    if (client) {
+      await client.close();
+      client = undefined;
+    }
+    
+    if (result) {
+      return result;
+    } 
+    else {
+      return { };
+    }
+    
+  }
+  catch (error) {
+    return { error: error };
+  } 
+}
+
 
 // end of mongodb functions
 
@@ -104,7 +181,7 @@ module.exports = function (app) {
 
     .put(function (req, res) {
       var project = req.params.project;
-
+      res.json({});
     })
 
     .delete(function (req, res) {
