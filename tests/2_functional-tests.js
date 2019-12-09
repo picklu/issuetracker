@@ -36,6 +36,8 @@ suite('Functional Tests', function () {
           assert.equal(body.assigned_to, 'Chai and Mocha');
           assert.equal(body.status_text, 'In QA');
           assert.isString(body._id);
+          assert.isBoolean(body.open);
+          assert.equal(body.open, true);
           done();
         })
         .catch(function (err) {
@@ -60,6 +62,8 @@ suite('Functional Tests', function () {
           assert.equal(body.assigned_to, '');
           assert.equal(body.status_text, '');
           assert.isString(body._id);
+          assert.isBoolean(body.open);
+          assert.equal(body.open, true);
           done();
         })
         .catch(function (err) {

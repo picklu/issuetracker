@@ -85,6 +85,7 @@ module.exports = function (app) {
       issue.issue_title = issue_title;
       issue.issue_text = issue_text;
       issue.created_by = created_by;
+      issue.open = true;
 
       let result;
       try {
