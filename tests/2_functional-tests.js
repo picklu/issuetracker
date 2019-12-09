@@ -70,6 +70,17 @@ suite('Functional Tests', function () {
         .then(function (res) {
           const { body, status } = res;
           assert.equal(status, 200);
+
+          assert.property(body, 'issue_title');
+          assert.property(body, 'issue_text');
+          assert.property(body, 'created_by');
+          assert.property(body, 'assigned_to');
+          assert.property(body, 'status_text');
+          assert.property(body, '_id');
+          assert.property(body, 'open');
+          assert.property(body, 'created_on');
+          assert.property(body, 'updated_on');
+
           assert.equal(body.issue_title, 'Title');
           assert.equal(body.issue_text, 'text');
           assert.equal(body.created_by, 'Functional Test - Every field filled in');
@@ -78,6 +89,8 @@ suite('Functional Tests', function () {
           assert.isString(body._id);
           assert.isBoolean(body.open);
           assert.equal(body.open, true);
+          assert.equal(moment(body.created_on, moment.ISO_8601, true).isValid(), true)
+          assert.equal(moment(body.updated_on, moment.ISO_8601, true).isValid(), true)
           done();
         })
         .catch(function (err) {
