@@ -11,14 +11,23 @@
 var expect = require('chai').expect;
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
+var MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
 
-const CONNECTION_STRING = process.env.DB;
+var CONNECTION_STRING = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
+const DB_TYPE = process.env.DB_TYPE;
 
 // aync:await in mongodb
 let client;
+let memoryServer;
 // connect to the database
 async function connectDB() {
+  if (DB_TYPE === 'mongodb-memory-server') {
+    if (!memoryServer) {
+      memoryServer = new MongoMemoryServer();
+      CONNECTION_STRING = await memoryServer.getConnectionString();
+    }
+  }
   if (!client) {
     try {
       client = await MongoClient.connect(CONNECTION_STRING, { useUnifiedTopology: true });
@@ -46,6 +55,12 @@ async function insertData(project, data) {
       await client.close();
       client = undefined;
     }
+
+    if (memoryServer) {
+      await memoryServer.stop();
+      memoryServer = undefined;
+    }
+
     return result;
   }
   catch (error) {
@@ -72,7 +87,7 @@ async function updateData(project, id, data) {
   }
   catch (error) {
     return { error: error };
-  } 
+  }
 }
 
 // get issue from the database
@@ -94,7 +109,7 @@ async function getData(project, data) {
   }
   catch (error) {
     return { error: error };
-  } 
+  }
 }
 
 
@@ -113,18 +128,18 @@ async function deleteData(project, id) {
       await client.close();
       client = undefined;
     }
-    
+
     if (result) {
       return result;
-    } 
-    else {
-      return { };
     }
-    
+    else {
+      return {};
+    }
+
   }
   catch (error) {
     return { error: error };
-  } 
+  }
 }
 
 
