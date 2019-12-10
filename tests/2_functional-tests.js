@@ -15,9 +15,9 @@ var server = require('../server');
 chai.use(chaiHttp);
 
 suite('Functional Tests', function () {
-
+  var issueId1;
+  var issueId2;
   suite('POST /api/issues/{project} => object with issue data', function () {
-
     test('Every field filled in', function (done) {
       chai.request(server)
         .post('/api/issues/test')
@@ -42,12 +42,14 @@ suite('Functional Tests', function () {
           assert.property(body, 'created_on');
           assert.property(body, 'updated_on');
 
+          issueId1 = body._id;
+          assert.isString(issueId1);
+
           assert.equal(body.issue_title, 'Title');
           assert.equal(body.issue_text, 'text');
           assert.equal(body.created_by, 'Functional Test - Every field filled in');
           assert.equal(body.assigned_to, 'Chai and Mocha');
           assert.equal(body.status_text, 'In QA');
-          assert.isString(body._id);
           assert.isBoolean(body.open);
           assert.equal(body.open, true);
           assert.equal(moment(body.created_on, moment.ISO_8601, true).isValid(), true)
@@ -81,12 +83,14 @@ suite('Functional Tests', function () {
           assert.property(body, 'created_on');
           assert.property(body, 'updated_on');
 
+          issueId2 = body._id;
+          assert.isString(issueId2);
+
           assert.equal(body.issue_title, 'Title');
           assert.equal(body.issue_text, 'text');
           assert.equal(body.created_by, 'Functional Test - Every field filled in');
           assert.equal(body.assigned_to, '');
           assert.equal(body.status_text, '');
-          assert.isString(body._id);
           assert.isBoolean(body.open);
           assert.equal(body.open, true);
           assert.equal(moment(body.created_on, moment.ISO_8601, true).isValid(), true)
@@ -121,6 +125,17 @@ suite('Functional Tests', function () {
   suite('PUT /api/issues/{project} => text', function () {
 
     test('No body', function (done) {
+      chai.request(server)
+        .put('/api/issues/test')
+        .then(function (res) {
+          assert.equal(res.status, 422);
+          assert.property(res, 'text');
+          assert.equal(res.text, 'All the fields are empty!');
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
 
     });
 
@@ -177,5 +192,4 @@ suite('Functional Tests', function () {
     });
 
   });
-
 });

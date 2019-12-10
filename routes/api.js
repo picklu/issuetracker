@@ -173,19 +173,26 @@ module.exports = function (app) {
 
     .post(async function (req, res) {
       var project = req.params.project;
+
+      // sanity check for body
+      if (!req.body) {
+        return res.status(422).json({ error: 'All the fields are empty!' });
+      }
+
       var issue_title = req.body.issue_title;
       var issue_text = req.body.issue_text;
       var created_by = req.body.created_by;
       var assigned_to = req.body.assigned_to || '';
       var status_text = req.body.status_text || '';
 
-      var issue = { project: project };
-      var now = new Date().toISOString();
 
-      // sanity check
+      // sanity check for important fields
       if (!issue_title || !issue_text || !created_by) {
-        return res.status(422).json({ error: '"One or more important fields are empty!' })
+        return res.status(422).json({ error: 'One or more important fields are empty!' })
       }
+
+      var issue = {};
+      var now = new Date().toISOString();
 
       issue.assigned_to = assigned_to;
       issue.status_text = status_text;
@@ -211,9 +218,54 @@ module.exports = function (app) {
       return res.json(issue);
     })
 
-    .put(function (req, res) {
+    .put(async function (req, res) {
       var project = req.params.project;
-      res.json({});
+      var issueId = req.body ? req.body._id : undefined;
+
+      // sanity check for body
+      if (Object.keys(req.body).length === 0) {
+        return res.status(422).send('All the fields are empty!');
+      }
+
+      if (!issueId) {
+        return res.status(422).send('_id must be provided!');
+      }
+
+      var issue_title = req.body.issue_title;
+      var issue_text = req.body.issue_text;
+      var created_by = req.body.created_by;
+      var assigned_to = req.body.assigned_to;
+      var status_text = req.body.status_text;
+      var open = req.body.open;
+
+      // sanity check for update fields
+      if (!issue_title && !issue_text && !created_by && assigned_to && status_text) {
+        return res.send('Update fields are empty!');
+      }
+
+      var issue = {}
+      if (issue_title) issue.issue_title = issue_title;
+      if (issue_text) issue.issue_text = issue_text;
+      if (created_by) issue.created_by = created_by;
+      if (assigned_to) issue.assigned_to = assigned_to;
+      if (status_text) issue.status_text = status_text;
+      if (open === false) issue.open = open;
+
+      issue.updated_on = new Date().toISOString();
+
+      let result;
+      try {
+        result = await updateData(project, ObjectId(issueId), issue);
+      }
+      catch (error) {
+        return res.send('Couldn\'t update ' + issueId);
+      }
+
+      if (result.error) {
+        return res.json(result);
+      }
+
+      return res.send('Successfully updated ' + issueId);
     })
 
     .delete(function (req, res) {
