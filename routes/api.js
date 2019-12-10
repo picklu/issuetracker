@@ -83,6 +83,12 @@ async function updateData(project, id, data) {
       await client.close();
       client = undefined;
     }
+
+    if (memoryServer) {
+      await memoryServer.stop();
+      memoryServer = undefined;
+    }
+
     return result;
   }
   catch (error) {
@@ -105,6 +111,12 @@ async function getData(project, data) {
       await client.close();
       client = undefined;
     }
+
+    if (memoryServer) {
+      await memoryServer.stop();
+      memoryServer = undefined;
+    }
+
     return result;
   }
   catch (error) {
@@ -127,6 +139,11 @@ async function deleteData(project, id) {
     if (client) {
       await client.close();
       client = undefined;
+    }
+
+    if (memoryServer) {
+      await memoryServer.stop();
+      memoryServer = undefined;
     }
 
     if (result) {
