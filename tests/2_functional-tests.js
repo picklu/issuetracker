@@ -135,11 +135,26 @@ suite('Functional Tests', function () {
         })
         .catch(function (err) {
           console.log(err);
-        })
+        });
 
     });
 
     test('One field to update', function (done) {
+      chai.request(server)
+        .put('/api/issues/test')
+        .send({
+          _id: issueId1,
+          issue_title: 'New title'
+        })
+        .then(function (res) {
+          assert.equal(res.status, 200);
+          assert.property(res, 'text');
+          assert.equal(res.text, 'Successfully updated ' + issueId1);
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
 
     });
 
