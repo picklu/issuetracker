@@ -134,7 +134,8 @@ async function deleteData(project, id) {
   const collection = db.collection(project);
   let result;
   try {
-    result = await collection.findOneAndDelete({ _id: id }, { $set: data });
+    result = await collection.findOneAndDelete({ _id: id });
+    console.log('==>', result);
     if (client) {
       await client.close();
       client = undefined;
@@ -144,14 +145,7 @@ async function deleteData(project, id) {
       await memoryServer.stop();
       memoryServer = undefined;
     }
-
-    if (result) {
-      return result;
-    }
-    else {
-      return {};
-    }
-
+    return result;
   }
   catch (error) {
     return { error: error };
@@ -289,9 +283,26 @@ module.exports = function (app) {
       }
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
       var project = req.params.project;
+      var issueId = req.query._id;
 
+      if (!issueId) {
+        return res.json({ error: 'id error!' });
+      }
+
+      let result;
+      try {
+        result = await deleteData(project, ObjectId(issueId));
+      }
+      catch (error) {
+        return res.json({ failed: 'could not delete ' + issueId + '.' });
+      }
+
+      if (result.error) {
+        return res.json({ failed: 'could not delete ' + issueId + '.' });
+      }
+      return res.json({ success: 'deleted ' + issueId + '.' });
     });
 
 };
