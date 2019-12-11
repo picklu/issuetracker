@@ -135,7 +135,6 @@ async function deleteData(project, id) {
   let result;
   try {
     result = await collection.findOneAndDelete({ _id: id });
-    console.log('==>', result);
     if (client) {
       await client.close();
       client = undefined;

@@ -288,7 +288,7 @@ suite('Functional Tests', function () {
         .then(function (res) {
           assert.equal(res.status, 200);
           assert.property(res.body, 'error');
-          assert.equal(res.body.error, 'id error!')
+          assert.equal(res.body.error, 'id error!');
           done();
         })
         .catch(function (err) {
@@ -297,7 +297,32 @@ suite('Functional Tests', function () {
     });
 
     test('Valid _id', function (done) {
-
+      chai.request(server)
+        .delete('/api/issues/test')
+        .query({ _id: issueId1 })
+        .then(function (res) {
+          assert.equal(res.status, 200);
+          assert.property(res.body, 'success');
+          assert.equal(res.body.success, 'deleted ' + issueId1 + '.');
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    });
+    test('Valid _id 2', function (done) {
+      chai.request(server)
+        .delete('/api/issues/test')
+        .query({ _id: issueId2 })
+        .then(function (res) {
+          assert.equal(res.status, 200);
+          assert.property(res.body, 'success');
+          assert.equal(res.body.success, 'deleted ' + issueId2 + '.');
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
     });
 
   });
