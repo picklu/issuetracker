@@ -106,7 +106,7 @@ async function getData(project, data) {
   const collection = db.collection(project);
   let result;
   try {
-    result = await collection.find(data);
+    result = await collection.find({open: true});
     if (client) {
       await client.close();
       client = undefined;
@@ -116,7 +116,6 @@ async function getData(project, data) {
       await memoryServer.stop();
       memoryServer = undefined;
     }
-
     return result;
   }
   catch (error) {
@@ -264,8 +263,12 @@ module.exports = function (app) {
       if (result.error) {
         return res.json(result);
       }
-
-      return res.send('Successfully updated ' + issueId);
+      else if (result.modifiedCount === 1 ) {
+        return res.send('Successfully updated ' + issueId);
+      }
+      else {
+        return res.send('Couldn\'t update ' + issueId);
+      }
     })
 
     .delete(function (req, res) {

@@ -159,6 +159,26 @@ suite('Functional Tests', function () {
     });
 
     test('Multiple fields to update', function (done) {
+      chai.request(server)
+        .put('/api/issues/test')
+        .send({
+          _id: issueId2,
+          issue_title: 'Updated Title',
+          issue_text: 'Updated text',
+          created_by: 'Updated Functional Test - Every field filled in',
+          assigned_to: 'Updated Chai and Mocha',
+          status_text: 'Updated In QA',
+          open: false
+        })
+        .then(function (res) {
+          assert.equal(res.status, 200);
+          assert.property(res, 'text');
+          assert.equal(res.text, 'Successfully updated ' + issueId2);
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
 
     });
 
