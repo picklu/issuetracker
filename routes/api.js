@@ -13,7 +13,7 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
 var MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
 
-var CONNECTION_STRING = process.env.DB_URL;
+var CONNECTION_STRING = process.env.DB_LOCAL || process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 const DB_TYPE = process.env.DB_TYPE;
 
@@ -281,7 +281,7 @@ module.exports = function (app) {
       if (result.error) {
         return res.json(result);
       }
-      else if (result.modifiedCount === 1 ) {
+      else if (result.modifiedCount === 1) {
         return res.send('Successfully updated ' + issueId);
       }
       else {
