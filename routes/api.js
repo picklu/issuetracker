@@ -106,7 +106,7 @@ async function getData(project, data) {
   const collection = db.collection(project);
   let result;
   try {
-    result = await collection.find({open: true});
+    result = await collection.find(data).toArray();
     if (client) {
       await client.close();
       client = undefined;
@@ -165,9 +165,27 @@ module.exports = function (app) {
 
   app.route('/api/issues/:project')
 
-    .get(function (req, res) {
-      var project = req.params;
-      res.json(project);
+    .get(async function (req, res) {
+      var project = req.params.project;
+
+      var query = req.query;
+
+      if (query._id) {
+        query._id = ObjectId(query._id);
+      }
+
+      let result;
+      try {
+        result = await getData(project, query);
+      }
+      catch (error) {
+        return res.json({});
+      }
+
+      if (result.error) {
+        return res.json({});
+      }
+      return res.json(result);
     })
 
     .post(async function (req, res) {

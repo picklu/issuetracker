@@ -119,7 +119,6 @@ suite('Functional Tests', function () {
           console.log(err);
         })
     });
-
   });
 
   suite('PUT /api/issues/{project} => text', function () {
@@ -136,7 +135,6 @@ suite('Functional Tests', function () {
         .catch(function (err) {
           console.log(err);
         });
-
     });
 
     test('One field to update', function (done) {
@@ -154,8 +152,7 @@ suite('Functional Tests', function () {
         })
         .catch(function (err) {
           console.log(err);
-        })
-
+        });
     });
 
     test('Multiple fields to update', function (done) {
@@ -178,8 +175,7 @@ suite('Functional Tests', function () {
         })
         .catch(function (err) {
           console.log(err);
-        })
-
+        });
     });
 
   });
@@ -190,7 +186,7 @@ suite('Functional Tests', function () {
       chai.request(server)
         .get('/api/issues/test')
         .query({})
-        .end(function (err, res) {
+        .then(function (res) {
           assert.equal(res.status, 200);
           assert.isArray(res.body);
           assert.property(res.body[0], 'issue_title');
@@ -203,11 +199,37 @@ suite('Functional Tests', function () {
           assert.property(res.body[0], 'status_text');
           assert.property(res.body[0], '_id');
           done();
+        })
+        .catch(function (err) {
+          console.log(err);
         });
     });
 
     test('One filter', function (done) {
+      chai.request(server)
+        .get('/api/issues/test')
+        .query({ _id: issueId2})
+        .then(function (res) {
+          assert.equal(res.status, 200);
 
+          assert.isArray(res.body);
+          assert.property(res.body[0], 'issue_title');
+          assert.property(res.body[0], 'issue_text');
+          assert.property(res.body[0], 'created_on');
+          assert.property(res.body[0], 'updated_on');
+          assert.property(res.body[0], 'created_by');
+          assert.property(res.body[0], 'assigned_to');
+          assert.property(res.body[0], 'open');
+          assert.property(res.body[0], 'status_text');
+          assert.property(res.body[0], '_id');
+
+          assert.equal(res.body[0]._id, issueId2);
+
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
     });
 
     test('Multiple filters (test for multiple fields you know will be in the db for a return)', function (done) {
