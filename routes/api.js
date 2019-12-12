@@ -20,6 +20,7 @@ const DB_TYPE = process.env.DB_TYPE;
 // aync:await in mongodb
 let client;
 let memoryServer;
+
 // connect to the database
 async function connectDB() {
   if (DB_TYPE === 'mongodb-memory-server') {
@@ -28,13 +29,17 @@ async function connectDB() {
       CONNECTION_STRING = await memoryServer.getConnectionString();
     }
   }
+  let result;
   if (!client) {
     try {
       client = await MongoClient.connect(CONNECTION_STRING, { useUnifiedTopology: true });
-      return { db: client.db(DB_NAME) };
+      result = { db: client.db(DB_NAME) };
     }
     catch (error) {
-      return { error: error };
+      result = { error: error };
+    }
+    finally {
+      return result;
     }
   }
   return { error: 'Previous connection was not closed!' };
@@ -51,6 +56,11 @@ async function insertData(project, data) {
   let result;
   try {
     result = await collection.insertOne(data);
+  }
+  catch (error) {
+    result = { error: error };
+  }
+  finally {
     if (client) {
       await client.close();
       client = undefined;
@@ -62,9 +72,6 @@ async function insertData(project, data) {
     }
 
     return result;
-  }
-  catch (error) {
-    return { error: error };
   }
 }
 
@@ -78,7 +85,12 @@ async function updateData(project, id, data) {
   const collection = db.collection(project);
   let result;
   try {
-    result = await collection.updateOne({ _id: id }, { $set: data });
+    result = await collection.updateOne({ _id: id }, { $set: data }); 
+  }
+  catch (error) {
+    result = { error: error };
+  }
+  finally {
     if (client) {
       await client.close();
       client = undefined;
@@ -90,9 +102,6 @@ async function updateData(project, id, data) {
     }
 
     return result;
-  }
-  catch (error) {
-    return { error: error };
   }
 }
 
@@ -107,19 +116,22 @@ async function getData(project, data) {
   let result;
   try {
     result = await collection.find(data).toArray();
+  }
+  catch (error) {
+    result = { error: error };
+  }
+  finally {
     if (client) {
       await client.close();
       client = undefined;
     }
-
+  
     if (memoryServer) {
       await memoryServer.stop();
       memoryServer = undefined;
     }
+    
     return result;
-  }
-  catch (error) {
-    return { error: error };
   }
 }
 
@@ -135,6 +147,11 @@ async function deleteData(project, id) {
   let result;
   try {
     result = await collection.findOneAndDelete({ _id: id });
+  }
+  catch (error) {
+    result = { error: error };
+  }
+  finally {
     if (client) {
       await client.close();
       client = undefined;
@@ -145,9 +162,6 @@ async function deleteData(project, id) {
       memoryServer = undefined;
     }
     return result;
-  }
-  catch (error) {
-    return { error: error };
   }
 }
 
