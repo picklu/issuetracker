@@ -18,8 +18,21 @@ const DB_NAME = process.env.DB_NAME;
 const DB_TYPE = process.env.DB_TYPE;
 
 // aync:await in mongodb
-let client;
-let memoryServer;
+var client;
+var memoryServer;
+
+async function closeDBConnection() {
+  if (client) {
+    await client.close();
+    client = undefined;
+  }
+
+  if (memoryServer) {
+    await memoryServer.stop();
+    memoryServer = undefined;
+  }
+  return;
+}
 
 // connect to the database
 async function connectDB() {
@@ -61,16 +74,7 @@ async function insertData(project, data) {
     result = { error: error };
   }
   finally {
-    if (client) {
-      await client.close();
-      client = undefined;
-    }
-
-    if (memoryServer) {
-      await memoryServer.stop();
-      memoryServer = undefined;
-    }
-
+    await closeDBConnection();
     return result;
   }
 }
@@ -91,16 +95,7 @@ async function updateData(project, id, data) {
     result = { error: error };
   }
   finally {
-    if (client) {
-      await client.close();
-      client = undefined;
-    }
-
-    if (memoryServer) {
-      await memoryServer.stop();
-      memoryServer = undefined;
-    }
-
+    await closeDBConnection();
     return result;
   }
 }
@@ -121,16 +116,7 @@ async function getData(project, data) {
     result = { error: error };
   }
   finally {
-    if (client) {
-      await client.close();
-      client = undefined;
-    }
-  
-    if (memoryServer) {
-      await memoryServer.stop();
-      memoryServer = undefined;
-    }
-    
+    await closeDBConnection();
     return result;
   }
 }
@@ -152,15 +138,7 @@ async function deleteData(project, id) {
     result = { error: error };
   }
   finally {
-    if (client) {
-      await client.close();
-      client = undefined;
-    }
-
-    if (memoryServer) {
-      await memoryServer.stop();
-      memoryServer = undefined;
-    }
+    await closeDBConnection();
     return result;
   }
 }
