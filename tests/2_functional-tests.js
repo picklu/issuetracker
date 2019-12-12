@@ -305,24 +305,11 @@ suite('Functional Tests', function () {
           assert.equal(res.status, 200);
           assert.property(res.body, 'success');
           assert.equal(res.body.success, 'deleted ' + issueId1 + '.');
+          done();
         })
         .catch(function (err) {
           console.log(err);
         });
-
-      // for issueId2
-      chai.request(server)
-        .delete('/api/issues/test')
-        .query({ _id: issueId2 })
-        .then(function (res) {
-          assert.equal(res.status, 200);
-          assert.property(res.body, 'success');
-          assert.equal(res.body.success, 'deleted ' + issueId2 + '.');
-        })
-        .catch(function (err) {
-          console.log(err);
-        });
-      done();
     });
   });
 });
