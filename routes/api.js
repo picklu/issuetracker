@@ -26,11 +26,6 @@ async function closeDBConnection() {
     await client.close();
     client = undefined;
   }
-
-  if (memoryServer) {
-    await memoryServer.stop();
-    memoryServer = undefined;
-  }
   return;
 }
 
